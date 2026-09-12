@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Productos — Ferretería FerreAmigo</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <img class="site-header__logo" src="assets/logo.svg" alt="Logo">
+    <div class="site-header__brand">
+      <strong>Ferretería FerreAmigo</strong>
+      <span>Catálogo de productos</span>
+    </div>
+    <div class="site-header__spacer"></div>
+    <div class="site-header__actions">
+      <button class="btn-back" id="backBtn" data-fallback="catalogo.html">← Volver</button>
+      <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="breadcrumb"><a href="modulos.html">Módulos</a> / <a href="catalogo.html">Catálogo</a> / <span id="breadcrumbCat">Categoría</span></div>
+  <div class="page-title-row">
+    <span class="icon-badge" id="categoryIcon">📦</span>
+    <h1 id="categoryName">Categoría</h1>
+  </div>
+
+  <div class="search-bar">
+    <span class="search-icon">🔎</span>
+    <input type="text" id="localSearch" placeholder="Buscar producto en esta categoría...">
+  </div>
+
+  <div class="toolbar">
+    <span id="productCount" style="color:var(--color-text-muted);font-size:.9rem;"></span>
+    <button class="btn btn-primary" id="addProductBtn">+ Agregar producto</button>
+  </div>
+
+  <div id="productListWrap"></div>
+</main>
+
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/categoria.js"></script>
+</body>
+</html>
