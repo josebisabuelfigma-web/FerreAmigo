@@ -63,7 +63,7 @@ const UI = (function () {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'activeModal';
-    overlay.innerHTML = '<div class="modal-box">' + innerHtml + '</div>';
+    overlay.innerHTML = '<div class="modal-box' + (options.wide ? ' modal-wide' : '') + '">' + innerHtml + '</div>';
     document.body.appendChild(overlay);
 
     if (options.closeOnOverlay !== false) {
@@ -113,6 +113,27 @@ const UI = (function () {
     return whatsappLink('Hola, necesito soporte para el producto FerreAmigo.');
   }
 
+  /* ------------------------------ Registro de actividad ------------------------------ */
+
+  function logAction(action, details) {
+    const session = AUTH.getSession();
+    if (!session) return Promise.resolve(false);
+    return DataService.logActivity({ user: session.user, role: session.role, action, details });
+  }
+
+  /* ------------------------------ Campos numéricos: limpiar el 0 inicial ------------------------------ */
+
+  // Delegado en document (funciona también para inputs creados dentro de modales
+  // dinámicos): al enfocar un campo numérico que solo tiene "0", lo vacía para
+  // que el usuario no termine escribiendo "0100" en vez de "100".
+  function wireNumericZeroClear() {
+    document.addEventListener('focusin', function (e) {
+      if (e.target.tagName === 'INPUT' && e.target.type === 'number' && e.target.value === '0') {
+        e.target.value = '';
+      }
+    });
+  }
+
   /* ------------------------------ Header: sesión y volver ------------------------------ */
 
   function wireHeaderCommon() {
@@ -131,20 +152,23 @@ const UI = (function () {
     }
 
     const userPill = document.getElementById('userPill');
-    if (userPill && AUTH.getSession()) {
-      userPill.textContent = 'Usuario: ' + AUTH.getSession().user;
+    const session = AUTH.getSession();
+    if (userPill && session) {
+      const roleLabel = session.role === 'admin' ? 'Administrador' : 'Auxiliar';
+      userPill.textContent = 'Usuario: ' + session.user + ' (' + roleLabel + ')';
     }
   }
 
   function init() {
     injectFooter();
     wireHeaderCommon();
+    wireNumericZeroClear();
   }
 
   return {
     whatsappLink, formatCurrency, escapeHtml,
     showToast, openModal, closeModal,
-    triggerLockedModule, supportLink, init
+    triggerLockedModule, supportLink, logAction, init
   };
 })();
 

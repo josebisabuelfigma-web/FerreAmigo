@@ -21,4 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
       if (e.key === 'Enter') UI.triggerLockedModule(el, name);
     });
   });
+
+  // El registro de actividad solo lo ve el perfil administrador.
+  const cardActividad = document.getElementById('cardActividad');
+  if (AUTH.isAdmin()) {
+    cardActividad.classList.remove('hidden');
+    cardActividad.addEventListener('click', () => window.location.href = 'actividad.html');
+    cardActividad.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') window.location.href = 'actividad.html';
+    });
+  }
 });

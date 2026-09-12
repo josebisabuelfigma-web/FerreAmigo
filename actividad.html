@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Actividad — Ferretería FerreAmigo</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <img class="site-header__logo" src="assets/logo.svg" alt="Logo">
+    <div class="site-header__brand">
+      <strong>Ferretería FerreAmigo</strong>
+      <span>Registro de actividad</span>
+    </div>
+    <div class="site-header__spacer"></div>
+    <div class="site-header__actions">
+      <button class="btn-back" id="backBtn" data-fallback="modulos.html">← Volver</button>
+      <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="breadcrumb"><a href="modulos.html">Módulos</a> / Registro de Actividad</div>
+  <div class="page-title-row">
+    <span class="icon-badge">📋</span>
+    <h1>Registro de Actividad</h1>
+  </div>
+  <p style="color:var(--color-text-muted);margin-top:-10px;margin-bottom:20px;">
+    Historial de acciones realizadas por cada usuario (administrador y auxiliar). Visible solo para el perfil administrador.
+  </p>
+
+  <div id="activityListWrap"></div>
+</main>
+
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/actividad.js"></script>
+</body>
+</html>

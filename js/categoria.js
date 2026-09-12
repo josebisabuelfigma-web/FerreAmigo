@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         DataService.updateProduct(id, data).then(() => {
           editingId = null;
+          UI.logAction('Producto editado', name + ' (' + currentCategory.name + ')');
           UI.showToast('Producto actualizado', 'success');
           loadProducts();
         });
@@ -154,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const prod = allProducts.find(p => p.id === id);
         if (confirm('¿Eliminar el producto "' + prod.name + '"?')) {
           DataService.deleteProduct(id).then(() => {
+            UI.logAction('Producto eliminado', prod.name + ' (' + currentCategory.name + ')');
             UI.showToast('Producto eliminado', 'success');
             loadProducts();
           });
@@ -200,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
         purchasePrice: document.getElementById('p_purchase').value,
         salePrice: document.getElementById('p_sale').value
       }).then(() => {
+        UI.logAction('Producto creado', name + ' (' + currentCategory.name + ')');
         UI.showToast('Producto agregado', 'success');
         UI.closeModal();
         loadProducts();

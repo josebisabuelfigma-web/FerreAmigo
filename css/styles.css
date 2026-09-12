@@ -13,8 +13,8 @@
   --color-text-muted: #6B7280;
   --color-border: #E5E7EB;
   --color-success: #16A34A;
-  --color-danger: #DC2626;
-  --color-danger-dark: #B91C1C;
+  --color-danger: #C0392B;
+  --color-danger-dark: #A93226;
   --color-whatsapp: #25D366;
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -278,6 +278,27 @@ ul { list-style: none; margin: 0; padding: 0; }
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(245,158,11,.2);
 }
+
+.password-field {
+  position: relative;
+}
+.password-field input {
+  padding-right: 44px;
+}
+.password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.15rem;
+  color: var(--color-text-muted);
+  padding: 6px 8px;
+  line-height: 1;
+}
+.password-toggle:hover { color: var(--color-text); }
 
 .field-error {
   color: var(--color-danger);
@@ -656,6 +677,7 @@ table.product-table {
   transition: transform var(--transition);
 }
 .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+.modal-box.modal-wide { max-width: 640px; }
 
 .modal-box h2 {
   margin: 0 0 4px;
@@ -790,3 +812,115 @@ table.product-table {
   padding: 2px 9px;
   margin-left: 6px;
 }
+
+/* ---------------------------------- Ventas y Gastos / Facturas ---------------------------------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card span { display: block; font-size: .78rem; color: var(--color-text-muted); margin-bottom: 4px; }
+.stat-card strong { font-size: 1.35rem; }
+.stat-card.stat-venta strong { color: var(--color-success); }
+.stat-card.stat-gasto strong { color: var(--color-danger); }
+.stat-card.stat-balance strong { color: var(--color-primary-dark); }
+
+.date-range-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.date-range-bar .field { margin-bottom: 0; }
+.date-range-bar .field input { min-width: 150px; }
+
+.action-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.action-buttons-row .btn-feature {
+  padding: 15px 28px;
+  font-size: 1.02rem;
+  min-width: 210px;
+  justify-content: center;
+}
+@media (max-width: 480px) {
+  .action-buttons-row .btn-feature { min-width: 0; flex: 1; }
+}
+
+.type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.type-toggle button {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--color-border);
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.type-toggle button.selected[data-type="venta"] { border-color: var(--color-success); color: var(--color-success); background: #F0FDF4; }
+.type-toggle button.selected[data-type="gasto"] { border-color: var(--color-danger); color: var(--color-danger); background: #FEF2F2; }
+
+.type-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+}
+.type-pill.venta { background: #DCFCE7; color: #15803D; }
+.type-pill.gasto { background: #FEE2E2; color: #B91C1C; }
+
+.amount-cell.venta { color: var(--color-success); font-weight: 700; }
+.amount-cell.gasto { color: var(--color-danger); font-weight: 700; }
+
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .82rem;
+  color: var(--color-text-muted);
+}
+
+.invoice-preview-frame {
+  width: 100%;
+  height: 60vh;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------------------------------- Registro de actividad ---------------------------------- */
+
+.role-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+}
+.role-pill.admin { background: #FEF3C7; color: #92400E; }
+.role-pill.auxiliar { background: #DBEAFE; color: #1D4ED8; }

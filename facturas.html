@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facturas de Proveedores — Ferretería FerreAmigo</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <img class="site-header__logo" src="assets/logo.svg" alt="Logo">
+    <div class="site-header__brand">
+      <strong>Ferretería FerreAmigo</strong>
+      <span>Facturas de proveedores</span>
+    </div>
+    <div class="site-header__spacer"></div>
+    <div class="site-header__actions">
+      <button class="btn-back" id="backBtn" data-fallback="modulos.html">← Volver</button>
+      <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="breadcrumb"><a href="modulos.html">Módulos</a> / Facturas de Proveedores</div>
+  <div class="page-title-row">
+    <span class="icon-badge">🧾</span>
+    <h1>Facturas de Proveedores</h1>
+  </div>
+
+  <div class="search-bar">
+    <span class="search-icon">🔎</span>
+    <input type="text" id="invoiceSearch" placeholder="Buscar por proveedor o número de factura...">
+  </div>
+
+  <div class="toolbar">
+    <span id="invoiceCount" style="color:var(--color-text-muted);font-size:.9rem;"></span>
+    <button class="btn btn-primary" id="addInvoiceBtn">+ Registrar factura</button>
+  </div>
+
+  <div id="invoiceListWrap"></div>
+</main>
+
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/facturas.js"></script>
+</body>
+</html>

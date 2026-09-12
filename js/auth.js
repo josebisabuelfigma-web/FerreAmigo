@@ -7,15 +7,24 @@
 
 const AUTH = (function () {
   const SESSION_KEY = 'fa_session';
-  const VALID_USERNAME = 'ferreamigo';
-  const VALID_PASSWORD = 'ferreamigo2024$';
+
+  // Perfiles válidos. "admin" ve todo, incluido el registro de actividad.
+  // "auxiliar" trabaja igual en el catálogo, pero queda registrado.
+  const USERS = [
+    { username: 'ferreamigo', password: 'ferreamigo2024$', role: 'admin' },
+    { username: 'auxiliar', password: 'auxiliar2024$', role: 'auxiliar' }
+  ];
 
   function login(username, password) {
-    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user: username, loggedAt: Date.now() }));
-      return true;
-    }
-    return false;
+    const match = USERS.find(u => u.username === username && u.password === password);
+    if (!match) return false;
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user: match.username, role: match.role, loggedAt: Date.now() }));
+    return true;
+  }
+
+  function isAdmin() {
+    const session = getSession();
+    return !!session && session.role === 'admin';
   }
 
   function isAuthenticated() {
@@ -42,5 +51,13 @@ const AUTH = (function () {
     }
   }
 
-  return { login, isAuthenticated, getSession, logout, requireAuth };
+  /** Llamar al inicio de páginas exclusivas del administrador (ej. actividad.html). */
+  function requireAdmin() {
+    requireAuth();
+    if (!isAdmin()) {
+      window.location.href = 'modulos.html';
+    }
+  }
+
+  return { login, isAuthenticated, isAdmin, getSession, logout, requireAuth, requireAdmin };
 })();

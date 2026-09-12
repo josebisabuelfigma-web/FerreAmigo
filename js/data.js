@@ -15,6 +15,7 @@ const DataService = (function () {
     products: 'fa_products',
     sales: 'fa_sales',       // reservado para el módulo de Ventas y Gastos
     invoices: 'fa_invoices', // reservado para el módulo de Facturas
+    activityLog: 'fa_activity_log',
     seedVersion: 'fa_seed_version'
   };
 
@@ -247,15 +248,148 @@ const DataService = (function () {
   }
 
   /* ------------------------------------------------------------------ */
-  /* Ventas / Gastos / Facturas — reservado (módulos bloqueados en la demo) */
+  /* Ventas y Gastos                                                     */
+  /* (módulo con candado en modulos.html; la lógica ya está lista        */
+  /* para cuando el cliente adquiera el módulo)                         */
   /* ------------------------------------------------------------------ */
 
-  function getSales() { return Promise.resolve(read(KEYS.sales, [])); }
-  function getInvoices() { return Promise.resolve(read(KEYS.invoices, [])); }
+  function getMovements() {
+    return Promise.resolve(read(KEYS.sales, []));
+  }
+
+  function getMovementsByRange(dateFrom, dateTo) {
+    return getMovements().then(all => all.filter(m => {
+      if (dateFrom && m.date < dateFrom) return false;
+      if (dateTo && m.date > dateTo) return false;
+      return true;
+    }));
+  }
+
+  function addMovement({ type, amount, description, date }) {
+    return getMovements().then(all => {
+      const movement = {
+        id: uid('mov'),
+        type: type === 'gasto' ? 'gasto' : 'venta',
+        amount: Number(amount) || 0,
+        description: (description || '').trim(),
+        date: date || new Date().toISOString().slice(0, 10),
+        createdAt: Date.now()
+      };
+      all.push(movement);
+      write(KEYS.sales, all);
+      return movement;
+    });
+  }
+
+  function updateMovement(id, data) {
+    return getMovements().then(all => {
+      const idx = all.findIndex(m => m.id === id);
+      if (idx === -1) throw new Error('Movimiento no encontrado');
+      const cleaned = Object.assign({}, all[idx], data);
+      if (data.amount !== undefined) cleaned.amount = Number(data.amount) || 0;
+      all[idx] = cleaned;
+      write(KEYS.sales, all);
+      return cleaned;
+    });
+  }
+
+  function deleteMovement(id) {
+    return getMovements().then(all => {
+      write(KEYS.sales, all.filter(m => m.id !== id));
+      return true;
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Facturas de Proveedores                                             */
+  /* (módulo con candado en modulos.html; la lógica ya está lista        */
+  /* para cuando el cliente adquiera el módulo)                         */
+  /* ------------------------------------------------------------------ */
+
+  function getInvoices() {
+    return Promise.resolve(read(KEYS.invoices, []));
+  }
+
+  function getInvoiceById(id) {
+    return getInvoices().then(all => all.find(i => i.id === id) || null);
+  }
+
+  function addInvoice({ provider, invoiceNumber, date, amount, fileName, fileData }) {
+    return getInvoices().then(all => {
+      const invoice = {
+        id: uid('inv'),
+        provider: (provider || '').trim(),
+        invoiceNumber: (invoiceNumber || '').trim(),
+        date: date || new Date().toISOString().slice(0, 10),
+        amount: Number(amount) || 0,
+        fileName: fileName || null,
+        fileData: fileData || null,
+        createdAt: Date.now()
+      };
+      all.push(invoice);
+      write(KEYS.invoices, all);
+      return invoice;
+    });
+  }
+
+  function updateInvoice(id, data) {
+    return getInvoices().then(all => {
+      const idx = all.findIndex(i => i.id === id);
+      if (idx === -1) throw new Error('Factura no encontrada');
+      const cleaned = Object.assign({}, all[idx], data);
+      if (data.amount !== undefined) cleaned.amount = Number(data.amount) || 0;
+      all[idx] = cleaned;
+      write(KEYS.invoices, all);
+      return cleaned;
+    });
+  }
+
+  function deleteInvoice(id) {
+    return getInvoices().then(all => {
+      write(KEYS.invoices, all.filter(i => i.id !== id));
+      return true;
+    });
+  }
+
+  function searchInvoices(query) {
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return getInvoices();
+    return getInvoices().then(all => all.filter(i =>
+      i.provider.toLowerCase().includes(q) || i.invoiceNumber.toLowerCase().includes(q)
+    ));
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Registro de actividad                                               */
+  /* (visible solo para el perfil administrador, ver auth.js requireAdmin) */
+  /* ------------------------------------------------------------------ */
+
+  function logActivity({ user, role, action, details }) {
+    return Promise.resolve(read(KEYS.activityLog, [])).then(log => {
+      log.push({
+        id: uid('log'),
+        user: user || 'desconocido',
+        role: role || 'auxiliar',
+        action,
+        details: details || '',
+        timestamp: Date.now()
+      });
+      write(KEYS.activityLog, log);
+      return true;
+    });
+  }
+
+  function getActivityLog() {
+    return Promise.resolve(read(KEYS.activityLog, [])).then(log =>
+      log.slice().sort((a, b) => b.timestamp - a.timestamp)
+    );
+  }
 
   return {
     getCategories, getCategoryById, addCategory, updateCategory, deleteCategory,
     getProducts, getProductById, addProduct, updateProduct, deleteProduct, searchProducts,
-    getSales, getInvoices
+    getMovements, getMovementsByRange, addMovement, updateMovement, deleteMovement,
+    getInvoices, getInvoiceById, addInvoice, updateInvoice, deleteInvoice, searchInvoices,
+    logActivity, getActivityLog
   };
 })();

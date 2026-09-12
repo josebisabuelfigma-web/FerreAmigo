@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ventas y Gastos — Ferretería FerreAmigo</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <img class="site-header__logo" src="assets/logo.svg" alt="Logo">
+    <div class="site-header__brand">
+      <strong>Ferretería FerreAmigo</strong>
+      <span>Ventas y gastos</span>
+    </div>
+    <div class="site-header__spacer"></div>
+    <div class="site-header__actions">
+      <button class="btn-back" id="backBtn" data-fallback="modulos.html">← Volver</button>
+      <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="breadcrumb"><a href="modulos.html">Módulos</a> / Ventas y Gastos</div>
+  <div class="page-title-row">
+    <span class="icon-badge">💵</span>
+    <h1>Ventas y Gastos</h1>
+  </div>
+
+  <div class="action-buttons-row">
+    <button class="btn btn-success btn-feature" id="addSaleBtn">+ Registrar venta</button>
+    <button class="btn btn-danger btn-feature" id="addExpenseBtn">+ Registrar gasto</button>
+  </div>
+
+  <div class="date-range-bar">
+    <div class="field">
+      <label for="dateFrom">Desde</label>
+      <input type="date" id="dateFrom">
+    </div>
+    <div class="field">
+      <label for="dateTo">Hasta</label>
+      <input type="date" id="dateTo">
+    </div>
+    <button class="btn btn-primary" id="consultarBtn">Consultar</button>
+    <button class="btn btn-secondary" id="todayBtn">Hoy</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card stat-venta"><span>Total ventas</span><strong id="statVentas">$0</strong></div>
+    <div class="stat-card stat-gasto"><span>Total gastos</span><strong id="statGastos">$0</strong></div>
+    <div class="stat-card stat-balance"><span>Balance</span><strong id="statBalance">$0</strong></div>
+  </div>
+
+  <div id="movementsWrap"></div>
+</main>
+
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/ventas.js"></script>
+</body>
+</html>

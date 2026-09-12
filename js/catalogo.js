@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const cat = categoriesCache.find(c => c.id === id);
         if (confirm('¿Eliminar la categoría "' + cat.name + '" y todos sus productos? Esta acción no se puede deshacer.')) {
           DataService.deleteCategory(id).then(() => {
+            UI.logAction('Categoría eliminada', cat.name);
             UI.showToast('Categoría eliminada', 'success');
             renderCategories();
           });
@@ -165,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         : DataService.addCategory({ name, icon, color, image });
 
       action.then(() => {
+        UI.logAction(editing ? 'Categoría editada' : 'Categoría creada', name);
         UI.showToast(editing ? 'Categoría actualizada' : 'Categoría creada', 'success');
         UI.closeModal();
         renderCategories();
