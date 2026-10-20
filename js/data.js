@@ -241,6 +241,19 @@ const DataService = (function () {
     });
   }
 
+  /** Suma unidades al inventario de un producto (entrada de mercancía). */
+  function addStock(productId, quantity) {
+    const qty = Math.floor(Number(quantity));
+    if (!(qty > 0)) return Promise.reject(new Error('Ingrese una cantidad mayor a cero'));
+    return getProducts().then(all => {
+      const idx = all.findIndex(p => p.id === productId);
+      if (idx === -1) throw new Error('Producto no encontrado');
+      all[idx].quantity = (Number(all[idx].quantity) || 0) + qty;
+      write(KEYS.products, all);
+      return all[idx];
+    });
+  }
+
   function searchProducts(query) {
     const q = (query || '').trim().toLowerCase();
     if (!q) return Promise.resolve([]);
@@ -263,6 +276,66 @@ const DataService = (function () {
       if (dateTo && m.date > dateTo) return false;
       return true;
     }));
+  }
+
+  /**
+   * Registra una venta de productos del catálogo: valida el stock de todas las
+   * líneas, descuenta el inventario y guarda la venta con el detalle (nombre y
+   * precio del momento). Todo o nada: si una línea no tiene stock, no cambia nada.
+   * items: [{ productId, quantity }]. Los precios salen siempre del catálogo.
+   */
+  function registerSale({ items, paymentMethod, date, user }) {
+    return getProducts().then(products => {
+      if (!items || items.length === 0) throw new Error('Agregue al menos un producto');
+      if (paymentMethod !== 'efectivo' && paymentMethod !== 'transferencia') {
+        throw new Error('Seleccione el método de pago');
+      }
+      const lines = items.map(it => {
+        const product = products.find(p => p.id === it.productId);
+        const qty = Math.floor(Number(it.quantity));
+        if (!product) throw new Error('Un producto de la venta ya no existe');
+        if (!(qty > 0)) throw new Error('Cantidad inválida para "' + product.name + '"');
+        if (qty > product.quantity) {
+          throw new Error('No hay unidades suficientes de "' + product.name + '" (disponibles: ' + product.quantity + ')');
+        }
+        return {
+          productId: product.id,
+          name: product.name,
+          quantity: qty,
+          unitPrice: product.salePrice,
+          purchasePrice: product.purchasePrice,
+          subtotal: product.salePrice * qty,
+          _product: product
+        };
+      });
+      // Un mismo producto repetido en varias líneas no puede exceder el stock en conjunto.
+      const used = {};
+      lines.forEach(l => {
+        used[l.productId] = (used[l.productId] || 0) + l.quantity;
+        if (used[l.productId] > l._product.quantity) {
+          throw new Error('No hay unidades suficientes de "' + l.name + '" (disponibles: ' + l._product.quantity + ')');
+        }
+      });
+      lines.forEach(l => { l._product.quantity -= l.quantity; delete l._product; });
+      write(KEYS.products, products);
+
+      const total = lines.reduce((sum, l) => sum + l.subtotal, 0);
+      const all = read(KEYS.sales, []);
+      const movement = {
+        id: uid('mov'),
+        type: 'venta',
+        amount: total,
+        description: lines.map(l => l.quantity + ' × ' + l.name).join(', '),
+        items: lines,
+        paymentMethod,
+        user: user || '',
+        date: date || new Date().toISOString().slice(0, 10),
+        createdAt: Date.now()
+      };
+      all.push(movement);
+      write(KEYS.sales, all);
+      return movement;
+    });
   }
 
   function addMovement({ type, amount, description, date }) {
@@ -293,8 +366,18 @@ const DataService = (function () {
     });
   }
 
+  /** Elimina un movimiento. Si era una venta de productos, devuelve las unidades al inventario. */
   function deleteMovement(id) {
     return getMovements().then(all => {
+      const movement = all.find(m => m.id === id);
+      if (movement && movement.items && movement.items.length) {
+        const products = read(KEYS.products, []);
+        movement.items.forEach(it => {
+          const product = products.find(p => p.id === it.productId);
+          if (product) product.quantity = (Number(product.quantity) || 0) + it.quantity;
+        });
+        write(KEYS.products, products);
+      }
       write(KEYS.sales, all.filter(m => m.id !== id));
       return true;
     });
@@ -387,8 +470,8 @@ const DataService = (function () {
 
   return {
     getCategories, getCategoryById, addCategory, updateCategory, deleteCategory,
-    getProducts, getProductById, addProduct, updateProduct, deleteProduct, searchProducts,
-    getMovements, getMovementsByRange, addMovement, updateMovement, deleteMovement,
+    getProducts, getProductById, addProduct, updateProduct, deleteProduct, addStock, searchProducts,
+    getMovements, getMovementsByRange, registerSale, addMovement, updateMovement, deleteMovement,
     getInvoices, getInvoiceById, addInvoice, updateInvoice, deleteInvoice, searchInvoices,
     logActivity, getActivityLog
   };

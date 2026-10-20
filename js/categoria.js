@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
         '<td data-label="Precio compra" class="price-cell">' + UI.formatCurrency(p.purchasePrice) + '</td>' +
         '<td data-label="Precio venta" class="price-cell">' + UI.formatCurrency(p.salePrice) + '</td>' +
         '<td data-label="Acciones"><div class="row-actions">' +
+          '<button class="btn btn-success btn-sm" data-addstock="' + p.id + '">➕ Agregar</button>' +
           '<button class="btn btn-secondary btn-sm" data-edit="' + p.id + '">✏️ Editar</button>' +
           '<button class="btn btn-danger btn-sm" data-delete="' + p.id + '">🗑️ Eliminar</button>' +
         '</div></td>' +
@@ -118,6 +119,12 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.addEventListener('click', () => {
         editingId = btn.getAttribute('data-edit');
         renderList(localSearch.value);
+      });
+    });
+
+    listWrap.querySelectorAll('[data-addstock]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openAddStockModal(allProducts.find(p => p.id === btn.getAttribute('data-addstock')));
       });
     });
 
@@ -161,6 +168,43 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         }
       });
+    });
+  }
+
+  /** Entrada de mercancía: las unidades nuevas se SUMAN a las que ya hay. */
+  function openAddStockModal(product) {
+    UI.openModal(
+      '<h2>➕ Agregar unidades</h2>' +
+      '<p class="modal-subtitle"><strong>' + UI.escapeHtml(product.name) + '</strong><br>Unidades actuales: <strong>' + product.quantity + '</strong></p>' +
+      '<form id="stockForm">' +
+        '<div class="field"><label for="st_qty">Cantidad a agregar</label>' +
+          '<input type="number" id="st_qty" min="1" step="1" required></div>' +
+        '<p class="stock-preview" id="stockPreview">Quedarán: <strong>' + product.quantity + '</strong> unidades</p>' +
+        '<div class="modal-actions">' +
+          '<button type="button" class="btn btn-secondary" id="stCancelBtn">Cancelar</button>' +
+          '<button type="submit" class="btn btn-success">Guardar</button>' +
+        '</div>' +
+      '</form>'
+    );
+
+    const qtyInput = document.getElementById('st_qty');
+    qtyInput.focus();
+    qtyInput.addEventListener('input', () => {
+      const n = parseInt(qtyInput.value, 10);
+      document.getElementById('stockPreview').innerHTML =
+        'Quedarán: <strong>' + (product.quantity + (n > 0 ? n : 0)) + '</strong> unidades';
+    });
+
+    document.getElementById('stCancelBtn').addEventListener('click', UI.closeModal);
+    document.getElementById('stockForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const qty = parseInt(qtyInput.value, 10);
+      DataService.addStock(product.id, qty).then(updated => {
+        UI.logAction('Entrada de stock', '+' + qty + ' ' + product.name + ' (' + currentCategory.name + ') — total: ' + updated.quantity);
+        UI.showToast('Se agregaron ' + qty + ' unidades', 'success');
+        UI.closeModal();
+        loadProducts();
+      }).catch(err => UI.showToast(err.message, 'danger'));
     });
   }
 
